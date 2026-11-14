@@ -75,7 +75,8 @@ export async function POST(req: Request) {
       requirements: job.requirements,
       description: text.slice(0, 15_000),
     });
-  } catch {
+  } catch (e) {
+    console.error("[extract] AI extraction failed:", e instanceof Error ? e.message : "unknown error");
     return NextResponse.json(
       { status: "needs_paste", reason: "ai_error", message: "The AI extraction step failed. You can paste the description or fill the fields in manually." },
     );

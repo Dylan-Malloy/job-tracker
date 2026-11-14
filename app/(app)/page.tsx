@@ -3,10 +3,23 @@ import { AddJob } from "@/components/add-job";
 import { JobCard } from "@/components/job-card";
 import { getHubContext } from "@/lib/hub";
 
+// Orange → yellow → green mirrors the workflow. Full class names so Tailwind can see them.
 const TABS = [
-  { key: "not_started", label: "NOT STARTED" },
-  { key: "in_progress", label: "IN-PROGRESS" },
-  { key: "finished", label: "FINISHED" },
+  {
+    key: "not_started", label: "NOT STARTED",
+    idle: "border-orange-400/40 text-orange-300 hover:bg-orange-400/10",
+    active: "border-orange-400 bg-orange-400/20 text-orange-100 shadow-[0_0_0_3px_rgba(251,146,60,0.15)]",
+  },
+  {
+    key: "in_progress", label: "IN-PROGRESS",
+    idle: "border-yellow-400/40 text-yellow-300 hover:bg-yellow-400/10",
+    active: "border-yellow-400 bg-yellow-400/20 text-yellow-100 shadow-[0_0_0_3px_rgba(250,204,21,0.15)]",
+  },
+  {
+    key: "finished", label: "FINISHED",
+    idle: "border-green-400/40 text-green-300 hover:bg-green-400/10",
+    active: "border-green-400 bg-green-400/20 text-green-100 shadow-[0_0_0_3px_rgba(74,222,128,0.15)]",
+  },
 ] as const;
 
 export default async function Dashboard({ searchParams }: PageProps<"/">) {
@@ -51,7 +64,8 @@ export default async function Dashboard({ searchParams }: PageProps<"/">) {
       <nav className="flex flex-wrap gap-2" aria-label="Application lists">
         {TABS.map((t) => (
           <Link key={t.key} href={`/?tab=${t.key}`}
-            className={`rounded-full border px-4 py-1.5 text-sm transition ${tab === t.key ? "border-primary bg-primary/20 text-text" : "border-border text-muted hover:text-text"}`}>
+            aria-current={tab === t.key ? "page" : undefined}
+            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition outline-none focus-visible:ring-2 focus-visible:ring-white/60 ${tab === t.key ? t.active : t.idle}`}>
             {t.label} <span className="ml-1 text-xs opacity-70">{counts[t.key]}</span>
           </Link>
         ))}
