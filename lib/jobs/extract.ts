@@ -1,5 +1,5 @@
 import "server-only";
-import { anthropic, MODEL } from "@/lib/ai/client";
+import { createMessage, MODEL } from "@/lib/ai/client";
 
 export type ExtractedJob = {
   isJobPosting: boolean;
@@ -18,7 +18,7 @@ If a field is not present, use an empty string / empty list.
 You MUST respond by calling the save_job tool exactly once; do not reply with plain text.`;
 
 export async function extractJob(text: string): Promise<ExtractedJob> {
-  const res = await anthropic().messages.create({
+  const res = await createMessage("job_extract", {
     model: MODEL,
     max_tokens: 2000,
     system: SYSTEM,

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withUsage } from "@/lib/ai/usage";
 import { createClient } from "@/lib/supabase/server";
 import { roleInHub } from "@/lib/hub";
 import { extractResumeText } from "@/lib/resumes/text";
@@ -31,10 +32,12 @@ export async function POST(req: Request, ctx: RouteContext<"/api/jobs/[id]/cover
     return NextResponse.json({ error: "Only the hub owner can use the cover letter generator." }, { status: 403 });
   }
 
+  const usageCtx = { userId: user.id, userEmail: user.email ?? null, hubId: job.hub_id, jobId: job.id };
   const timeZone = await getTimeZone();
   const enc = new TextEncoder();
   const stream = new ReadableStream({
-    async start(controller) {
+    start(controller) {
+      return withUsage(usageCtx, async () => {
       const send = (o: object) => controller.enqueue(enc.encode(JSON.stringify(o) + "\n"));
       const step = (sid: string, label: string) => send({ type: "step", id: sid, label });
       const finish = (o: object) => { send({ type: "result", ...o }); controller.close(); };
@@ -96,6 +99,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/jobs/[id]/cover
         console.error("[cover-letter] failed:", e instanceof Error ? e.message : "unknown error");
         return finish({ ok: false, error: "The generator failed. Please try again." });
       }
+      });
     },
   });
   return new Response(stream, { headers: { "content-type": "application/x-ndjson", "cache-control": "no-store" } });

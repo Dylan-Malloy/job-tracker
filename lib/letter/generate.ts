@@ -1,5 +1,5 @@
 import "server-only";
-import { anthropic, MODEL } from "@/lib/ai/client";
+import { createMessage, MODEL } from "@/lib/ai/client";
 import { longDate } from "@/lib/tz";
 import { measureLetterFit } from "./render";
 import { letterText, type LetterDoc } from "./types";
@@ -27,7 +27,7 @@ const VERIFY = `You are a strict fact-checker. Compare a COVER LETTER with the a
 List every statement in the letter that claims or implies experience, skills, tools, employers, titles, dates, education, certifications, achievements, numbers or scope that are NOT supported by the SOURCE. Generic polite phrasing, enthusiasm, and statements about the job posting itself are fine and must NOT be listed. If everything is supported, return an empty list. You MUST respond by calling the report tool exactly once.`;
 
 async function draft(source: string, notes: string, job: Job, tone: Tone, feedback: string[]): Promise<string[]> {
-  const res = await anthropic().messages.create({
+  const res = await createMessage("cover_letter", {
     model: MODEL,
     max_tokens: 3000,
     system: SYSTEM,
@@ -56,7 +56,7 @@ async function draft(source: string, notes: string, job: Job, tone: Tone, feedba
 }
 
 async function violationsFor(source: string, letter: string): Promise<Violation[]> {
-  const res = await anthropic().messages.create({
+  const res = await createMessage("cover_letter_factcheck", {
     model: MODEL,
     max_tokens: 1500,
     system: VERIFY,

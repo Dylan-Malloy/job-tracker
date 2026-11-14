@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withUsage } from "@/lib/ai/usage";
 import { createClient } from "@/lib/supabase/server";
 import { roleInHub } from "@/lib/hub";
 import { normalizeJobUrl } from "@/lib/jobs/normalize";
@@ -43,10 +44,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: (e as Error).message }, { status: 400 });
   }
 
+  const usageCtx = { userId: user.id, userEmail: user.email ?? null, hubId: body.hubId };
   // Stream progress as newline-delimited JSON so the UI can say what is happening.
   const enc = new TextEncoder();
   const stream = new ReadableStream({
-    async start(controller) {
+    start(controller) {
+      return withUsage(usageCtx, async () => {
       const send = (o: object) => controller.enqueue(enc.encode(JSON.stringify(o) + "\n"));
       const step = (id: string, label: string) => send({ type: "step", id, label });
       const done = (payload: object) => { send({ type: "result", ...payload }); controller.close(); };
@@ -100,6 +103,7 @@ export async function POST(req: Request) {
       } catch {
         return done({ status: "needs_paste", reason: "network", message: REASON_TEXT.network });
       }
+      });
     },
   });
   return new Response(stream, { headers: { "content-type": "application/x-ndjson", "cache-control": "no-store" } });
