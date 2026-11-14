@@ -1,0 +1,14 @@
+import { redirect } from "next/navigation";
+import { Header } from "@/components/header";
+import { getHubContext } from "@/lib/hub";
+
+export default async function AppLayout({ children }: LayoutProps<"/">) {
+  const { user, hubs, current } = await getHubContext();
+  if (!current) redirect("/login");
+  return (
+    <>
+      <Header hubs={hubs} current={current} email={user.email ?? ""} />
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
+    </>
+  );
+}
