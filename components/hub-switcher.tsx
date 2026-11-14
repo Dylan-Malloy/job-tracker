@@ -8,7 +8,7 @@ export function HubSwitcher({ hubs, currentId }: { hubs: { id: string; name: str
   if (hubs.length < 2) return <span className="text-sm text-muted">{hubs[0]?.name}</span>;
   return (
     <select
-      aria-label="Switch hub"
+      aria-label="Switch hub" data-tip="Switch between your hub and hubs shared with you"
       className="input !w-auto !py-1"
       value={currentId}
       disabled={pending}

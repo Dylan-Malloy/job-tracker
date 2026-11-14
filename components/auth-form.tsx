@@ -34,7 +34,7 @@ export function AuthForm({ mode, action, next }: { mode: "login" | "signup"; act
               {state.error}
             </p>
           )}
-          <button className="btn w-full" disabled={pending}>
+          <button className="btn w-full" disabled={pending} data-tip={isLogin ? "Log in with this email and password" : "Create your account — we'll email a verification link"}>
             {pending ? "Please wait…" : isLogin ? "Log in" : "Sign up"}
           </button>
         </form>

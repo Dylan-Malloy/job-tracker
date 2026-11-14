@@ -36,7 +36,7 @@ export function ResumeUpload({ hubId, isOwner }: { hubId: string; isOwner: boole
       <input ref={input} type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         className="input file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1 file:text-white" />
       <p className="text-xs text-muted">.pdf or .docx only, up to 10 MB.</p>
-      <button className="btn" disabled={busy}>{busy ? "Uploading…" : "Upload"}</button>
+      <button className="btn" disabled={busy} data-tip="Upload the selected .pdf or .docx to your resume bank">{busy ? "Uploading…" : "Upload"}</button>
       {msg && <p role="alert" className={`text-sm ${msg.ok ? "text-success" : "text-danger"}`}>{msg.text}</p>}
     </form>
   );

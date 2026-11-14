@@ -68,3 +68,59 @@ body {
     @apply inline-flex items-center rounded-full border border-border bg-surface-2 px-2 py-0.5 text-xs text-accent;
   }
 }
+
+/* Tooltips: any element with data-tip. Shows on hover and keyboard focus; data-tip-end anchors to the right edge. */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  width: max-content;
+  max-width: min(260px, 80vw);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #2a1a47;
+  color: #f1ecfb;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 70;
+  transition: opacity 0.12s ease 0.35s, transform 0.12s ease 0.35s;
+}
+[data-tip][data-tip-end]::after {
+  left: auto;
+  right: 0;
+  transform: translateY(-2px);
+}
+@media (hover: hover) {
+  [data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  [data-tip][data-tip-end]:hover::after {
+    transform: translateY(0);
+  }
+}
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0s;
+}
+[data-tip][data-tip-end]:focus-visible::after {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tip]::after { transition: none; }
+}

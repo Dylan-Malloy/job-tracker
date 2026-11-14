@@ -31,14 +31,14 @@ export default async function ResumesPage() {
             {r.approved
               ? <span className="badge !border-success/40 !text-success">Approved</span>
               : <span className="badge !border-warn/40 !text-warn">Pending owner approval</span>}
-            <a className="btn-ghost" href={`/api/resumes/${r.id}/download`}>Download</a>
+            <a className="btn-ghost" href={`/api/resumes/${r.id}/download`} data-tip="Download your original resume file">Download</a>
             {isOwner && !r.approved && (
-              <form action={setResumeApproval.bind(null, r.id, true)}><button className="btn">Approve</button></form>
+              <form action={setResumeApproval.bind(null, r.id, true)}><button className="btn" data-tip="Approve this resume so it can be used for applications and the AI assistant">Approve</button></form>
             )}
             {isOwner && r.approved && (
-              <form action={setResumeApproval.bind(null, r.id, false)}><button className="btn-ghost">Revoke approval</button></form>
+              <form action={setResumeApproval.bind(null, r.id, false)}><button className="btn-ghost" data-tip="Make this resume unusable again until you re-approve it">Revoke approval</button></form>
             )}
-            {isOwner && <form action={deleteResume.bind(null, r.id)}><button className="btn-danger">Delete</button></form>}
+            {isOwner && <form action={deleteResume.bind(null, r.id)}><button className="btn-danger" data-tip="Delete this resume file permanently" data-tip-end>Delete</button></form>}
           </div>
         ))}
       </div>

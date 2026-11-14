@@ -33,7 +33,7 @@ export default async function SharingPage() {
           <div key={m.id} className="card flex flex-wrap items-center gap-3">
             <div className="min-w-0 flex-1 truncate">{m.member_email ?? "Unknown"}</div>
             <span className="badge">{ROLE_LABEL[m.role]}</span>
-            <form action={revokeMember.bind(null, m.id)}><button className="btn-danger">Revoke access</button></form>
+            <form action={revokeMember.bind(null, m.id)}><button className="btn-danger" data-tip="Remove this person's access immediately" data-tip-end>Revoke access</button></form>
           </div>
         ))}
       </section>
@@ -46,7 +46,7 @@ export default async function SharingPage() {
               <div className="min-w-0 flex-1 truncate">{i.email}</div>
               <span className="badge">{ROLE_LABEL[i.role]}</span>
               <span className="text-xs text-muted">expires {new Date(i.expires_at).toLocaleDateString()}</span>
-              <form action={revokeInvite.bind(null, i.id)}><button className="btn-danger">Cancel</button></form>
+              <form action={revokeInvite.bind(null, i.id)}><button className="btn-danger" data-tip="Cancel this invite so its link stops working" data-tip-end>Cancel</button></form>
             </div>
           ))}
         </section>

@@ -34,7 +34,7 @@ export function InviteForm({ hubId }: { hubId: string }) {
           <option value="viewer">View-only</option>
           <option value="helper">Helper</option>
         </select>
-        <button className="btn shrink-0" disabled={busy}>{busy ? "Creating…" : "Create invite"}</button>
+        <button className="btn shrink-0" disabled={busy} data-tip="Create a one-time invite link to share with this person" data-tip-end>{busy ? "Creating…" : "Create invite"}</button>
       </div>
       <p className="text-xs text-muted">
         You&apos;ll get a one-time link to share (valid 7 days). It only works when they sign in with this exact email.
@@ -44,7 +44,7 @@ export function InviteForm({ hubId }: { hubId: string }) {
           <p className="mb-2 text-muted">Share this link — it won&apos;t be shown again:</p>
           <div className="flex gap-2">
             <input readOnly className="input font-mono text-xs" value={link} onFocus={(e) => e.currentTarget.select()} />
-            <button type="button" className="btn-ghost shrink-0"
+            <button type="button" className="btn-ghost shrink-0" data-tip="Copy the invite link" data-tip-end
               onClick={() => { navigator.clipboard.writeText(link); setCopied(true); }}>{copied ? "Copied" : "Copy"}</button>
           </div>
         </div>

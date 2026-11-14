@@ -109,7 +109,7 @@ export function AddJob({ hubId }: { hubId: string }) {
       {banner && (
         <div role="alert" className="fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-4 bg-red-600 px-4 py-3 text-sm font-medium text-white shadow-lg">
           <span>{banner}</span>
-          <button onClick={() => setBanner(null)} aria-label="Dismiss" className="text-lg leading-none">×</button>
+          <button onClick={() => setBanner(null)} aria-label="Dismiss" className="px-2 text-lg leading-none" data-tip="Dismiss this message" data-tip-end>×</button>
         </div>
       )}
       <section className="card">
@@ -118,7 +118,7 @@ export function AddJob({ hubId }: { hubId: string }) {
           <form onSubmit={(e) => { e.preventDefault(); extract(false); }} className="flex flex-col gap-2 sm:flex-row">
             <input className="input" placeholder="Paste a job link (LinkedIn, Indeed, Glassdoor, careers page…)"
               value={url} onChange={(e) => setUrl(e.target.value)} required type="url" />
-            <button className="btn shrink-0" disabled={busy || !url}>{extracting && !needPaste ? "Reading…" : "Add"}</button>
+            <button className="btn shrink-0" disabled={busy || !url} data-tip="Read this link and pull out the company, position and requirements" data-tip-end>{extracting && !needPaste ? "Reading…" : "Add"}</button>
           </form>
         )}
         {(extracting || (steps.length > 0 && !draft && !needPaste)) && (
@@ -141,13 +141,13 @@ export function AddJob({ hubId }: { hubId: string }) {
             <p className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-sm text-warn">{needPaste}</p>
             <textarea className="input min-h-32" placeholder="Paste the job description here…" value={pasted} onChange={(e) => setPasted(e.target.value)} />
             <div className="flex gap-2">
-              <button className="btn" disabled={busy || pasted.trim().length < 50} onClick={() => extract(true)}>
+              <button className="btn" disabled={busy || pasted.trim().length < 50} onClick={() => extract(true)} data-tip="Extract the job details from the text you pasted">
                 {busy ? "Extracting…" : "Extract from text"}
               </button>
-              <button className="btn-ghost" onClick={() => setDraft({ url, company: "", position: "", requirements: "", description: pasted })}>
+              <button className="btn-ghost" onClick={() => setDraft({ url, company: "", position: "", requirements: "", description: pasted })} data-tip="Skip extraction and type the job details yourself">
                 Fill in manually
               </button>
-              <button className="btn-ghost" onClick={reset}>Cancel</button>
+              <button className="btn-ghost" onClick={reset} data-tip="Discard this and start over">Cancel</button>
             </div>
           </div>
         )}
@@ -165,10 +165,10 @@ export function AddJob({ hubId }: { hubId: string }) {
             <div><label className="label">Requirements (one per line)</label>
               <textarea className="input min-h-40" value={draft.requirements} onChange={(e) => setDraft({ ...draft, requirements: e.target.value })} /></div>
             <div className="flex gap-2">
-              <button className="btn" disabled={busy || !draft.company.trim() || !draft.position.trim()} onClick={save}>
+              <button className="btn" disabled={busy || !draft.company.trim() || !draft.position.trim()} onClick={save} data-tip="Add this job to your NOT STARTED list">
                 {busy ? "Saving…" : "Save to NOT STARTED"}
               </button>
-              <button className="btn-ghost" onClick={reset}>Cancel</button>
+              <button className="btn-ghost" onClick={reset} data-tip="Discard this job without saving">Cancel</button>
             </div>
           </div>
         )}

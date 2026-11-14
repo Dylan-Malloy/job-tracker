@@ -6,17 +6,17 @@ import { getHubContext } from "@/lib/hub";
 // Orange → yellow → green mirrors the workflow. Full class names so Tailwind can see them.
 const TABS = [
   {
-    key: "not_started", label: "NOT STARTED",
+    key: "not_started", label: "NOT STARTED", tip: "Jobs waiting for you to apply",
     idle: "border-orange-400/40 text-orange-300 hover:bg-orange-400/10",
     active: "border-orange-400 bg-orange-400/20 text-orange-100 shadow-[0_0_0_3px_rgba(251,146,60,0.15)]",
   },
   {
-    key: "in_progress", label: "IN-PROGRESS",
+    key: "in_progress", label: "IN-PROGRESS", tip: "Jobs you've applied to and are waiting on",
     idle: "border-yellow-400/40 text-yellow-300 hover:bg-yellow-400/10",
     active: "border-yellow-400 bg-yellow-400/20 text-yellow-100 shadow-[0_0_0_3px_rgba(250,204,21,0.15)]",
   },
   {
-    key: "finished", label: "FINISHED",
+    key: "finished", label: "FINISHED", tip: "Applications that ended in a hiring or a rejection",
     idle: "border-green-400/40 text-green-300 hover:bg-green-400/10",
     active: "border-green-400 bg-green-400/20 text-green-100 shadow-[0_0_0_3px_rgba(74,222,128,0.15)]",
   },
@@ -64,7 +64,7 @@ export default async function Dashboard({ searchParams }: PageProps<"/">) {
       <nav className="flex flex-wrap gap-2" aria-label="Application lists">
         {TABS.map((t) => (
           <Link key={t.key} href={`/?tab=${t.key}`}
-            aria-current={tab === t.key ? "page" : undefined}
+            aria-current={tab === t.key ? "page" : undefined} data-tip={t.tip}
             className={`rounded-full border px-4 py-1.5 text-sm font-medium transition outline-none focus-visible:ring-2 focus-visible:ring-white/60 ${tab === t.key ? t.active : t.idle}`}>
             {t.label} <span className="ml-1 text-xs opacity-70">{counts[t.key]}</span>
           </Link>
@@ -76,6 +76,7 @@ export default async function Dashboard({ searchParams }: PageProps<"/">) {
           <span className="text-muted">Show:</span>
           {[["all", "All"], ["accepted", "Hirings"], ["denied", "Rejections"]].map(([k, l]) => (
             <Link key={k} href={`/?tab=finished&sort=${k}`}
+              data-tip={k === "all" ? "Show every finished application" : k === "accepted" ? "Show only jobs where you were hired" : "Show only jobs where you were rejected"}
               className={`rounded-md px-2 py-1 ${sort === k ? "bg-surface-2 text-accent" : "text-muted hover:text-text"}`}>{l}</Link>
           ))}
         </div>

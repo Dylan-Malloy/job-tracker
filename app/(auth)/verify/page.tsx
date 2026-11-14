@@ -9,7 +9,7 @@ export default function VerifyPage() {
         <p className="mt-2 text-sm text-muted">
           We sent a verification link. Click it to activate your account, then log in.
         </p>
-        <Link href="/login" className="btn-ghost mt-5">Back to log in</Link>
+        <Link href="/login" className="btn-ghost mt-5" data-tip="Go to the log in page">Back to log in</Link>
       </div>
     </main>
   );
