@@ -23,7 +23,7 @@ export class OnePageError extends Error {
   }
 }
 
-async function draw(layout: Layout, pdf: PDFDocument, fonts: Awaited<ReturnType<typeof loadFonts>>) {
+export async function draw(layout: Layout, pdf: PDFDocument, fonts: Awaited<ReturnType<typeof loadFonts>>) {
   const pages = Array.from({ length: layout.pages }, () => pdf.addPage([PAGE.w, PAGE.h]));
   const c = (x: Rgb) => rgb(x[0], x[1], x[2]);
   for (const op of layout.ops) {

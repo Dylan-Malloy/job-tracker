@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CompareViewer } from "@/components/compare-viewer";
+import { CoverLetterPanel } from "@/components/cover-letter-panel";
+import { LetterViewer } from "@/components/letter-viewer";
 import { TailorPanel } from "@/components/tailor-panel";
 import { getHubContext } from "@/lib/hub";
 import { LIST_LABEL } from "@/lib/jobs/duplicate";
@@ -16,11 +18,16 @@ export default async function JobPage({ params }: PageProps<"/jobs/[id]">) {
   const role = current!.id === job.hub_id ? current!.role : null;
   const isOwner = role === "owner";
 
-  const [{ data: resumes }, { data: tweaks }] = await Promise.all([
+  const [{ data: resumes }, { data: tweaks }, { data: letters }] = await Promise.all([
     supabase.from("resumes").select("id, filename").eq("hub_id", job.hub_id).eq("approved", true).order("created_at", { ascending: false }),
     supabase.from("resume_tweaks").select("id, resume_id, changes, created_at, tailored_resume").eq("job_id", id).order("created_at", { ascending: false }).limit(5),
+    supabase.from("cover_letters").select("id, body_text, source_label, created_at").eq("job_id", id).order("created_at", { ascending: false }).limit(5),
   ]);
   const results = (tweaks ?? []).filter((t) => t.tailored_resume);
+  const letterSources = [
+    ...(results[0] ? [{ value: `tweak:${results[0].id}`, label: "Latest tailored resume for this job (recommended)" }] : []),
+    ...(resumes ?? []).map((r) => ({ value: `resume:${r.id}`, label: r.filename })),
+  ];
 
   return (
     <div className="space-y-6">
@@ -75,6 +82,28 @@ export default async function JobPage({ params }: PageProps<"/jobs/[id]">) {
               ))}
             </ul>
           </details>
+        </section>
+      ))}
+
+      {isOwner && (
+        <section className="card space-y-3">
+          <div>
+            <h2 className="text-lg font-semibold">Cover letter generator</h2>
+            <p className="text-sm text-muted">A one-page letter for this job that only uses what&apos;s true in your resume.</p>
+          </div>
+          <CoverLetterPanel jobId={job.id} sources={letterSources} defaultSource={letterSources[0]?.value ?? ""} />
+        </section>
+      )}
+
+      {(letters ?? []).map((l, idx) => (
+        <section key={l.id} className="card space-y-3">
+          <h2 className="text-sm font-semibold">
+            {idx === 0 ? "Latest cover letter" : "Earlier cover letter"} · {new Date(l.created_at).toLocaleString()}
+            <span className="font-normal text-muted"> · from {l.source_label}</span>
+          </h2>
+          {idx === 0 ? <LetterViewer id={l.id} text={l.body_text} /> : (
+            <details><summary className="cursor-pointer text-sm text-accent">Show this letter</summary><div className="mt-3"><LetterViewer id={l.id} text={l.body_text} /></div></details>
+          )}
         </section>
       ))}
 

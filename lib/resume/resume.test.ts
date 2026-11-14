@@ -52,3 +52,25 @@ describe("parseOriginal", () => {
     expect(d.sections[0].blocks[1]).toMatchObject({ kind: "bullet", text: "Built APIs" });
   });
 });
+
+import { LetterTooLongError, measureLetterFit, renderLetterDocx, renderLetterPdf } from "../letter/render";
+import type { LetterDoc } from "../letter/types";
+
+const para = (n: number) => Array.from({ length: n }, () => "I built and maintained reliable backend services for internal teams and customers, working closely with product managers to deliver on schedule.").join(" ");
+const letter = (words: number): LetterDoc => ({
+  name: "Alex Morgan", contact: "alex@example.com | Austin, TX", date: "November 14, 2026", company: "Northwind Labs",
+  greeting: "Dear Hiring Team,", paragraphs: [para(words), para(words), para(words)], closing: "Sincerely,", signature: "Alex Morgan",
+});
+
+describe("cover letter one-page guarantee", () => {
+  it("renders a normal letter on exactly one page (PDF and DOCX)", async () => {
+    const bytes = await renderLetterPdf(letter(3));
+    expect((await PDFDocument.load(bytes)).getPageCount()).toBe(1);
+    expect((await renderLetterDocx(letter(3))).subarray(0, 2).toString()).toBe("PK");
+  });
+  it("refuses an over-long letter instead of spilling onto page 2", async () => {
+    expect((await measureLetterFit(letter(12))).fits).toBe(false);
+    await expect(renderLetterPdf(letter(12))).rejects.toBeInstanceOf(LetterTooLongError);
+    await expect(renderLetterDocx(letter(12))).rejects.toBeInstanceOf(LetterTooLongError);
+  });
+});

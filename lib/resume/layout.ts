@@ -42,7 +42,7 @@ export function sanitize(text: string, font: PDFFont): string {
   return out.replace(/\s+/g, " ").trim();
 }
 
-function wrap(text: string, font: PDFFont, size: number, maxW: number): string[] {
+export function wrap(text: string, font: PDFFont, size: number, maxW: number): string[] {
   const words = text.split(" ").filter(Boolean);
   const lines: string[] = [];
   let cur = "";

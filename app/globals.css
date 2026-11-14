@@ -77,8 +77,8 @@ body {
   content: attr(data-tip);
   position: absolute;
   top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-2px);
+  left: 0;
+  transform: translateY(-2px);
   width: max-content;
   max-width: min(260px, 80vw);
   padding: 6px 10px;
@@ -107,19 +107,17 @@ body {
 @media (hover: hover) {
   [data-tip]:hover::after {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-  [data-tip][data-tip-end]:hover::after {
     transform: translateY(0);
   }
 }
 [data-tip]:focus-visible::after {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
   transition-delay: 0s;
 }
-[data-tip][data-tip-end]:focus-visible::after {
-  transform: translateY(0);
+/* No tooltip on disabled controls (e.g. "Writing…" while a job runs): it would cover the progress list. */
+[data-tip]:disabled::after {
+  display: none;
 }
 @media (prefers-reduced-motion: reduce) {
   [data-tip]::after { transition: none; }
