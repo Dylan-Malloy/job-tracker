@@ -7,6 +7,7 @@ import { flattenResume, type ResumeDoc } from "@/lib/resume/types";
 import { generateCoverLetter, type Tone } from "@/lib/letter/generate";
 import { letterText } from "@/lib/letter/types";
 import { renderLetterPdf } from "@/lib/letter/render";
+import { getTimeZone } from "@/lib/tz";
 
 export const maxDuration = 120;
 
@@ -30,6 +31,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/jobs/[id]/cover
     return NextResponse.json({ error: "Only the hub owner can use the cover letter generator." }, { status: 403 });
   }
 
+  const timeZone = await getTimeZone();
   const enc = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
@@ -65,7 +67,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/jobs/[id]/cover
         }
 
         const result = await generateCoverLetter(
-          { source, notes, job, tone, name: doc?.name || "Applicant", contact: doc?.contact ?? "" },
+          { source, notes, job, tone, name: doc?.name || "Applicant", contact: doc?.contact ?? "", timeZone },
           step,
         );
         if (!result.ok) {

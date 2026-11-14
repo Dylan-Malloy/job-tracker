@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { InviteForm } from "@/components/invite-form";
 import { getHubContext } from "@/lib/hub";
+import { fmtDate, getTimeZone } from "@/lib/tz";
 import { revokeInvite, revokeMember } from "./actions";
 
 const ROLE_LABEL: Record<string, string> = { viewer: "View-only", helper: "Helper" };
@@ -8,6 +9,7 @@ const ROLE_LABEL: Record<string, string> = { viewer: "View-only", helper: "Helpe
 export default async function SharingPage() {
   const { supabase, user, current } = await getHubContext();
   const hub = current!;
+  const tz = await getTimeZone();
   if (hub.role !== "owner") redirect("/");
 
   const [{ data: members }, { data: invites }] = await Promise.all([
@@ -45,7 +47,7 @@ export default async function SharingPage() {
             <div key={i.id} className="card flex flex-wrap items-center gap-3">
               <div className="min-w-0 flex-1 truncate">{i.email}</div>
               <span className="badge">{ROLE_LABEL[i.role]}</span>
-              <span className="text-xs text-muted">expires {new Date(i.expires_at).toLocaleDateString()}</span>
+              <span className="text-xs text-muted">expires {fmtDate(i.expires_at, tz)}</span>
               <form action={revokeInvite.bind(null, i.id)}><button className="btn-danger" data-tip="Cancel this invite so its link stops working" data-tip-end>Cancel</button></form>
             </div>
           ))}

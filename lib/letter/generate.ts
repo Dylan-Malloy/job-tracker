@@ -1,5 +1,6 @@
 import "server-only";
 import { anthropic, MODEL } from "@/lib/ai/client";
+import { longDate } from "@/lib/tz";
 import { measureLetterFit } from "./render";
 import { letterText, type LetterDoc } from "./types";
 
@@ -88,10 +89,10 @@ export type LetterOutcome =
   | { ok: false; reason: "too_long" | "unfaithful"; violations: Violation[] };
 
 export async function generateCoverLetter(
-  args: { source: string; notes: string; job: Job; tone: Tone; name: string; contact: string },
+  args: { source: string; notes: string; job: Job; tone: Tone; name: string; contact: string; timeZone: string },
   onStep: (id: string, label: string) => void,
 ): Promise<LetterOutcome> {
-  const date = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  const date = longDate(args.timeZone);
   const shell = (paragraphs: string[]): LetterDoc => ({
     name: args.name, contact: args.contact, date, company: args.job.company,
     greeting: "Dear Hiring Team,", paragraphs, closing: "Sincerely,", signature: args.name,
