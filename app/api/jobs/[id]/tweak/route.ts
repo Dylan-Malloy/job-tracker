@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withUsage } from "@/lib/ai/usage";
 import { createClient } from "@/lib/supabase/server";
 import { roleInHub } from "@/lib/hub";
 import { extractResumeText } from "@/lib/resumes/text";
@@ -41,10 +42,12 @@ export async function POST(req: Request, ctx: RouteContext<"/api/jobs/[id]/tweak
   if (!resume || resume.hub_id !== job.hub_id) return NextResponse.json({ error: "Resume not found." }, { status: 404 });
   if (!resume.approved) return NextResponse.json({ error: "That resume hasn't been approved yet." }, { status: 400 });
 
+  const usageCtx = { userId: user.id, userEmail: user.email ?? null, hubId: job.hub_id, jobId: job.id };
   // Stream progress so the UI can show what the assistant is doing.
   const enc = new TextEncoder();
   const stream = new ReadableStream({
-    async start(controller) {
+    start(controller) {
+      return withUsage(usageCtx, async () => {
       const send = (o: object) => controller.enqueue(enc.encode(JSON.stringify(o) + "\n"));
       const step = (id: string, label: string) => send({ type: "step", id, label });
       const finish = (o: object) => { send({ type: "result", ...o }); controller.close(); };
@@ -105,6 +108,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/jobs/[id]/tweak
         console.error("[tweak] failed:", e instanceof Error ? e.message : "unknown error");
         return finish({ ok: false, error: "The assistant failed. Please try again." });
       }
+      });
     },
   });
   return new Response(stream, { headers: { "content-type": "application/x-ndjson", "cache-control": "no-store" } });

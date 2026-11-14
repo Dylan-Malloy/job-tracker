@@ -1,5 +1,5 @@
 import "server-only";
-import { anthropic, MODEL } from "@/lib/ai/client";
+import { createMessage, MODEL } from "@/lib/ai/client";
 import { measureFit } from "@/lib/resume/render-pdf";
 import { coerceResume, flattenResume, type ResumeDoc } from "@/lib/resume/types";
 
@@ -43,7 +43,7 @@ const blockSchema = {
 };
 
 async function tailorOnce(resume: string, job: Job, notes: string[]): Promise<{ doc: ResumeDoc; changes: Change[] }> {
-  const res = await anthropic().messages.create({
+  const res = await createMessage("resume_tailor", {
     model: MODEL,
     max_tokens: 8000,
     system: TAILOR_SYSTEM,
@@ -97,7 +97,7 @@ async function tailorOnce(resume: string, job: Job, notes: string[]): Promise<{ 
 }
 
 export async function findViolations(original: string, tailored: string): Promise<Violation[]> {
-  const res = await anthropic().messages.create({
+  const res = await createMessage("resume_factcheck", {
     model: MODEL,
     max_tokens: 2000,
     system: VERIFY_SYSTEM,
