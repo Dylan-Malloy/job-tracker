@@ -6,12 +6,14 @@ import { LetterViewer } from "@/components/letter-viewer";
 import { TailorPanel } from "@/components/tailor-panel";
 import { getHubContext } from "@/lib/hub";
 import { LIST_LABEL } from "@/lib/jobs/duplicate";
+import { fmtDateTime, getTimeZone } from "@/lib/tz";
 import { setJobResume } from "../actions";
 
 type Change = { kind: string; before: string; after: string; reason: string; requirement?: string };
 
 export default async function JobPage({ params }: PageProps<"/jobs/[id]">) {
   const { id } = await params;
+  const tz = await getTimeZone();
   const { supabase, current } = await getHubContext();
   const { data: job } = await supabase.from("jobs").select("*").eq("id", id).maybeSingle();
   if (!job) notFound();
@@ -56,7 +58,7 @@ export default async function JobPage({ params }: PageProps<"/jobs/[id]">) {
         <section key={t.id} className="card space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-semibold">
-              {idx === 0 ? "Latest tailored resume" : "Earlier version"} · {new Date(t.created_at).toLocaleString()}
+              {idx === 0 ? "Latest tailored resume" : "Earlier version"} · {fmtDateTime(t.created_at, tz)}
             </h2>
             <div className="flex gap-2">
               <a className="btn" href={`/api/tweaks/${t.id}/pdf?view=tailored&download=1`} data-tip="Download the tailored resume as a one-page PDF">Download PDF</a>
@@ -98,7 +100,7 @@ export default async function JobPage({ params }: PageProps<"/jobs/[id]">) {
       {(letters ?? []).map((l, idx) => (
         <section key={l.id} className="card space-y-3">
           <h2 className="text-sm font-semibold">
-            {idx === 0 ? "Latest cover letter" : "Earlier cover letter"} · {new Date(l.created_at).toLocaleString()}
+            {idx === 0 ? "Latest cover letter" : "Earlier cover letter"} · {fmtDateTime(l.created_at, tz)}
             <span className="font-normal text-muted"> · from {l.source_label}</span>
           </h2>
           {idx === 0 ? <LetterViewer id={l.id} text={l.body_text} /> : (

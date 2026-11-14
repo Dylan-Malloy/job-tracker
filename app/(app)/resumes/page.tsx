@@ -1,10 +1,12 @@
 import { ResumeUpload } from "@/components/resume-upload";
 import { getHubContext } from "@/lib/hub";
+import { fmtDate, getTimeZone } from "@/lib/tz";
 import { deleteResume, setResumeApproval } from "./actions";
 
 export default async function ResumesPage() {
   const { supabase, current } = await getHubContext();
   const hub = current!;
+  const tz = await getTimeZone();
   const { data: resumes } = await supabase
     .from("resumes")
     .select("id, filename, kind, approved, created_at")
@@ -26,7 +28,7 @@ export default async function ResumesPage() {
           <div key={r.id} className="card flex flex-wrap items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{r.filename}</p>
-              <p className="text-xs text-muted">{r.kind.toUpperCase()} · {new Date(r.created_at).toLocaleDateString()}</p>
+              <p className="text-xs text-muted">{r.kind.toUpperCase()} · {fmtDate(r.created_at, tz)}</p>
             </div>
             {r.approved
               ? <span className="badge !border-success/40 !text-success">Approved</span>
