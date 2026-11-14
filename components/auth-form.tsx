@@ -40,7 +40,7 @@ export function AuthForm({ mode, action, next }: { mode: "login" | "signup"; act
         </form>
         <p className="mt-4 text-center text-sm text-muted">
           {isLogin ? "New here? " : "Already have an account? "}
-          <Link className="text-accent hover:underline" href={isLogin ? "/signup" : "/login"}>
+          <Link className="text-accent hover:underline" href={`${isLogin ? "/signup" : "/login"}${next && next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}>
             {isLogin ? "Create an account" : "Log in"}
           </Link>
         </p>
