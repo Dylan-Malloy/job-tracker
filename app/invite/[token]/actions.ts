@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -36,4 +36,33 @@ export async function acceptInvite(token: string) {
   await admin.from("hub_invites").update({ accepted_at: new Date().toISOString() }).eq("id", invite.id);
   (await cookies()).set(HUB_COOKIE, invite.hub_id, { path: "/", httpOnly: true, sameSite: "lax", maxAge: 60 * 60 * 24 * 365 });
   redirect("/");
+}
+
+/** Create an account for an invited email. The database also refuses any sign-up without a pending invite. */
+export async function joinWithInvite(token: string, _: { error?: string } | undefined, formData: FormData) {
+  const password = String(formData.get("password") ?? "");
+  if (password.length < 8) return { error: "Password must be at least 8 characters." };
+
+  const admin = createAdminClient();
+  const { data: invite } = await admin
+    .from("hub_invites")
+    .select("email, expires_at, accepted_at")
+    .eq("token_hash", hashToken(token))
+    .maybeSingle();
+  if (!invite || invite.accepted_at || new Date(invite.expires_at) < new Date()) {
+    return { error: "This invite is no longer valid. Ask the hub owner for a new one." };
+  }
+
+  const h = await headers();
+  const origin = h.get("origin") ?? `https://${h.get("host")}`;
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signUp({
+    email: invite.email,
+    password,
+    options: { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(`/invite/${token}`)}` },
+  });
+  if (error) {
+    return { error: /invit/i.test(error.message) ? "This invite can't be used to create an account." : error.message };
+  }
+  redirect("/verify");
 }

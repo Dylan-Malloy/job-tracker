@@ -15,6 +15,7 @@ export function Header({ hubs, current, email }: { hubs: HubInfo[]; current: Hub
           <Link href="/" className="hover:text-text" data-tip="Your NOT STARTED, IN-PROGRESS and FINISHED lists">Applications</Link>
           <Link href="/resumes" className="hover:text-text" data-tip="Upload and manage resumes (.pdf or .docx)">Resumes</Link>
           {current.role === "owner" && <Link href="/sharing" className="hover:text-text" data-tip="Invite helpers or viewers and revoke access">Sharing</Link>}
+          <Link href="/account" className="hover:text-text" data-tip="Change your password">Account</Link>
         </nav>
         <div className="ml-auto flex items-center gap-3">
           <HubSwitcher hubs={hubs} currentId={current.id} />

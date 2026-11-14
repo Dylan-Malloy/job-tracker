@@ -1,22 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState } from "react";
 
 type Action = (s: { error?: string } | undefined, f: FormData) => Promise<{ error?: string } | undefined>;
 
-export function AuthForm({ mode, action, next }: { mode: "login" | "signup"; action: Action; next?: string }) {
+export function AuthForm({ action, next }: { action: Action; next?: string }) {
   const [state, formAction, pending] = useActionState(action, undefined);
-  const isLogin = mode === "login";
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/20 text-2xl">📋</div>
-          <h1 className="text-2xl font-semibold">{isLogin ? "Welcome back" : "Create your hub"}</h1>
-          <p className="mt-1 text-sm text-muted">
-            {isLogin ? "Log in to your job application hub." : "Track every application in one place."}
-          </p>
+          <h1 className="text-2xl font-semibold">Welcome back</h1>
+          <p className="mt-1 text-sm text-muted">Log in to your job application hub.</p>
         </div>
         <form action={formAction} className="card space-y-4">
           <input type="hidden" name="next" value={next ?? "/"} />
@@ -26,23 +22,19 @@ export function AuthForm({ mode, action, next }: { mode: "login" | "signup"; act
           </div>
           <div>
             <label className="label" htmlFor="password">Password</label>
-            <input id="password" name="password" type="password" required minLength={8}
-              autoComplete={isLogin ? "current-password" : "new-password"} className="input" />
+            <input id="password" name="password" type="password" required minLength={8} autoComplete="current-password" className="input" />
           </div>
           {state?.error && (
             <p role="alert" className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
               {state.error}
             </p>
           )}
-          <button className="btn w-full" disabled={pending} data-tip={isLogin ? "Log in with this email and password" : "Create your account — we'll email a verification link"}>
-            {pending ? "Please wait…" : isLogin ? "Log in" : "Sign up"}
+          <button className="btn w-full" disabled={pending} data-tip="Log in with this email and password">
+            {pending ? "Please wait…" : "Log in"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-muted">
-          {isLogin ? "New here? " : "Already have an account? "}
-          <Link className="text-accent hover:underline" href={`${isLogin ? "/signup" : "/login"}${next && next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}>
-            {isLogin ? "Create an account" : "Log in"}
-          </Link>
+          Job Hub is invite-only. Got an invite link? Open it to create your account.
         </p>
       </div>
     </main>

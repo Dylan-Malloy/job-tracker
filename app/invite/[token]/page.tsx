@@ -2,7 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hashToken } from "@/lib/invites";
-import { acceptInvite } from "./actions";
+import { JoinForm } from "@/components/join-form";
+import { acceptInvite, joinWithInvite } from "./actions";
 
 const ROLE_TEXT: Record<string, string> = {
   viewer: "view the hub (view-only)",
@@ -51,9 +52,12 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
             {user ? (
               <form action={acceptInvite.bind(null, token)} className="mt-5"><button className="btn w-full" data-tip="Join this hub with the access described above">Accept invite</button></form>
             ) : (
-              <div className="mt-5 flex gap-2">
-                <Link className="btn flex-1" href={`/login?next=/invite/${token}`} data-tip="Log in, then accept the invite">Log in</Link>
-                <Link className="btn-ghost flex-1" href={`/signup?next=/invite/${token}`} data-tip="Create an account, then accept the invite">Sign up</Link>
+              <div className="mt-5 space-y-4">
+                <JoinForm action={joinWithInvite.bind(null, token)} email={invite.email} />
+                <p className="text-sm text-muted">
+                  Already have an account?{" "}
+                  <Link className="text-accent hover:underline" href={`/login?next=/invite/${token}`} data-tip="Log in, then accept the invite">Log in</Link>
+                </p>
               </div>
             )}
           </>
