@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/signup", "/auth", "/verify", "/invite"];
+const PUBLIC_PATHS = ["/login", "/auth", "/verify", "/invite", "/welcome"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -27,6 +27,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+  // Visitors without an account see the landing page at "/" (the URL stays "/").
+  if (!user && path === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/welcome";
+    return NextResponse.rewrite(url, { request });
+  }
   const isPublic = PUBLIC_PATHS.some((p) => path === p || path.startsWith(p + "/"));
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
@@ -35,7 +41,7 @@ export async function updateSession(request: NextRequest) {
     if (path !== "/") url.searchParams.set("next", path + request.nextUrl.search);
     return NextResponse.redirect(url);
   }
-  if (user && (path === "/login" || path === "/signup")) {
+  if (user && path === "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";

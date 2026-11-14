@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -24,21 +23,6 @@ export async function login(_: { error?: string } | undefined, formData: FormDat
     };
   }
   redirect(safeNext(formData.get("next")));
-}
-
-export async function signup(_: { error?: string } | undefined, formData: FormData) {
-  const password = String(formData.get("password") ?? "");
-  if (password.length < 8) return { error: "Password must be at least 8 characters." };
-  const h = await headers();
-  const origin = h.get("origin") ?? `https://${h.get("host")}`;
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
-    email: String(formData.get("email") ?? "").trim(),
-    password,
-    options: { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safeNext(formData.get("next")))}` },
-  });
-  if (error) return { error: error.message };
-  redirect("/verify");
 }
 
 export async function logout() {
